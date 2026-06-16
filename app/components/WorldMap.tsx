@@ -76,7 +76,7 @@ export default function WorldMap({ destinations }: { destinations: DestinationPi
           <Marker
             key={dest.slug}
             coordinates={dest.coordinates}
-            onClick={(e) => handlePin(dest, e as unknown as React.MouseEvent)}
+            onClick={(e: unknown) => handlePin(dest, e as unknown as React.MouseEvent)}
           >
             <g className="cursor-pointer">
               {/* Outer glow ring for selected pin */}
