@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  image     String?
+  createdAt DateTime @default(now())
+}
+
+model Destination {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  name           String
+  country        String
+  heroImage      String
+  galleryImages  String   @default("[]")
+  golfScore      Int
+  foodScore      Int
+  hotelScore     Int
+  overallScore   Float
+  description    String
+  body           String
+  twitterEmbed   String?
+  instagramEmbed String?
+  published      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
