@@ -49,8 +49,8 @@ export default function WorldMap({ destinations }: { destinations: DestinationPi
         className="w-full h-auto"
       >
         <Geographies geography={GEO_URL}>
-          {({ geographies }) =>
-            geographies.map((geo) => (
+          {({ geographies }: { geographies: any[] }) =>
+            geographies.map((geo: any) => (
               <Geography
                 key={geo.rsmKey}
                 geography={geo}
