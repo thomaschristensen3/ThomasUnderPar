@@ -7,6 +7,11 @@ import Link from "next/link";
 const GEO_URL =
   "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
+interface GeoFeature {
+  rsmKey: string;
+  [key: string]: unknown;
+}
+
 export interface DestinationPin {
   slug: string;
   name: string;
@@ -49,8 +54,8 @@ export default function WorldMap({ destinations }: { destinations: DestinationPi
         className="w-full h-auto"
       >
         <Geographies geography={GEO_URL}>
-          {({ geographies }: { geographies: any[] }) =>
-            geographies.map((geo: any) => (
+          {({ geographies }: { geographies: GeoFeature[] }) =>
+            geographies.map((geo: GeoFeature) => (
               <Geography
                 key={geo.rsmKey}
                 geography={geo}
