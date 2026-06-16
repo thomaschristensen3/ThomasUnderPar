@@ -15,13 +15,10 @@ const schema = z.object({
     .min(1, "Slug is required")
     .regex(/^[a-z0-9-]+$/, "Lowercase letters, numbers, and hyphens only"),
   heroImage: z.string().url("Must be a valid URL"),
-  golfScore: z.number({ invalid_type_error: "Required" }).int().min(1).max(10),
-  foodScore: z.number({ invalid_type_error: "Required" }).int().min(1).max(10),
-  hotelScore: z.number({ invalid_type_error: "Required" }).int().min(1).max(10),
-  overallScore: z
-    .number({ invalid_type_error: "Required" })
-    .min(0)
-    .max(10),
+  golfScore: z.number().int().min(1).max(10),
+  foodScore: z.number().int().min(1).max(10),
+  hotelScore: z.number().int().min(1).max(10),
+  overallScore: z.number().min(0).max(10),
   description: z
     .string()
     .min(1, "Description is required")
