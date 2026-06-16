@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -21,7 +21,7 @@ model Destination {
   name           String
   country        String
   heroImage      String
-  galleryImages  String   @default("[]")
+  galleryImages  Json     @default("[]")
   golfScore      Int
   foodScore      Int
   hotelScore     Int
