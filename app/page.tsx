@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import Image from "next/image";
 import Link from "next/link";
-import dynamic from "next/dynamic";
+import dynamicImport from "next/dynamic";
 import Nav from "./components/Nav";
 import Footer from "./components/Footer";
 import { prisma } from "@/lib/prisma";
@@ -10,7 +10,7 @@ import { DESTINATION_COORDINATES } from "@/lib/coordinates";
 import type { DestinationPin } from "./components/WorldMap";
 import Sidebar from "./components/Sidebar";
 
-const WorldMap = dynamic(() => import("./components/WorldMap"), {
+const WorldMap = dynamicImport(() => import("./components/WorldMap"), {
   ssr: false,
   loading: () => (
     <div className="h-[380px] rounded-2xl bg-blue-50 border border-gray-100 animate-pulse" />
