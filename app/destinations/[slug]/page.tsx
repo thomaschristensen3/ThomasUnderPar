@@ -8,6 +8,8 @@ import Footer from "@/app/components/Footer";
 import MarkdownBody from "@/app/components/MarkdownBody";
 import Sidebar from "@/app/components/Sidebar";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 interface Props {
   params: { slug: string };
@@ -26,11 +28,14 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export default async function DestinationPage({ params }: Props) {
-  const dest = await prisma.destination.findUnique({
-    where: { slug: params.slug },
-  });
+  const [dest, session] = await Promise.all([
+    prisma.destination.findUnique({ where: { slug: params.slug } }),
+    getServerSession(authOptions),
+  ]);
 
   if (!dest) notFound();
+
+  const isLoggedIn = !!session;
 
   return (
     <>
@@ -66,7 +71,7 @@ export default async function DestinationPage({ params }: Props) {
           {/* Main content */}
           <div className="flex-1 min-w-0">
 
-            {/* Score badges */}
+            {/* Score badges — always visible */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12 p-6 bg-gray-50 rounded-2xl border border-gray-100">
               <ScoreBadge label="Golf" score={dest.golfScore} />
               <ScoreBadge label="Food" score={dest.foodScore} />
@@ -74,13 +79,66 @@ export default async function DestinationPage({ params }: Props) {
               <ScoreBadge label="Overall" score={dest.overallScore} highlight />
             </div>
 
-            {/* Description intro */}
+            {/* Description intro — always visible */}
             <p className="text-lg sm:text-xl text-gray-600 leading-relaxed mb-10 font-medium">
               {dest.description}
             </p>
 
-            {/* Rich text body */}
-            <MarkdownBody body={dest.body} />
+            {isLoggedIn ? (
+              /* Full review body for members */
+              <MarkdownBody body={dest.body} />
+            ) : (
+              /* Teaser gate for visitors */
+              <div className="relative">
+                {/* Blurred preview of first paragraph */}
+                <div className="select-none pointer-events-none blur-sm opacity-60 line-clamp-4 text-gray-700 text-base leading-relaxed mb-0">
+                  {dest.body.slice(0, 500)}
+                </div>
+
+                {/* Gradient fade */}
+                <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white to-transparent" />
+
+                {/* CTA card */}
+                <div className="relative mt-4 rounded-2xl border border-gray-100 bg-gray-50 p-8 text-center shadow-sm">
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-forest/10 mb-4">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-7 w-7 text-forest"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1.8}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      />
+                    </svg>
+                  </div>
+                  <h2 className="text-xl font-bold text-gray-900 mb-2">
+                    Members-only full review
+                  </h2>
+                  <p className="text-gray-500 text-sm max-w-sm mx-auto mb-6">
+                    Create a free account to read the complete course guide — holes, hotels, restaurants, and what to pack.
+                  </p>
+                  <div className="flex items-center justify-center gap-3 flex-wrap">
+                    <Link
+                      href={`/register?callbackUrl=/destinations/${dest.slug}`}
+                      className="inline-flex items-center px-6 py-3 rounded-md bg-forest text-white text-sm font-semibold hover:bg-forest-dark transition-colors"
+                    >
+                      Join Free
+                    </Link>
+                    <Link
+                      href={`/login?callbackUrl=/destinations/${dest.slug}`}
+                      className="inline-flex items-center px-6 py-3 rounded-md border border-forest text-forest text-sm font-semibold hover:bg-forest/5 transition-colors"
+                    >
+                      Sign In
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Back link */}
             <div className="mt-14 pt-8 border-t border-gray-100">

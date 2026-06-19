@@ -10,7 +10,7 @@ export default withAuth({
 });
 
 export const config = {
-  matcher: [
-    "/((?!api/auth|login|register|_next/static|_next/image|favicon.ico).*)",
-  ],
+  // Only the admin area requires authentication via middleware.
+  // Destination pages handle their own soft gate (teaser vs full content).
+  matcher: ["/admin/:path*"],
 };
