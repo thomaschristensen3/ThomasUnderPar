@@ -17,6 +17,9 @@ export default function Footer() {
             <a href="#" className="hover:text-white transition-colors">
               Contact
             </a>
+            <a href="/admin/new-review" className="hover:text-white transition-colors">
+              Admin
+            </a>
           </nav>
         </div>
         <div className="mt-6 pt-6 border-t border-white/10 text-center text-xs text-white/40">
