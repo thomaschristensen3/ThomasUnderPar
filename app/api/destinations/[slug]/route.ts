@@ -3,7 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 
 const categorySchema = z.object({
-  score: z.number().int().min(0).max(10),
+  score: z.number().min(0).max(10),
   description: z.string(),
   media: z.array(
     z.object({
