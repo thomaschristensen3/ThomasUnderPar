@@ -100,7 +100,7 @@ export default async function DestinationPage({ params }: Props) {
                 </div>
                 <div className="flex items-baseline gap-1 shrink-0">
                   <span className="text-7xl font-bold text-white leading-none">
-                    {dest.overallScore}
+                    {dest.overallScore.toFixed(1)}
                   </span>
                   <span className="text-2xl text-white/50">/10</span>
                 </div>
@@ -126,7 +126,7 @@ export default async function DestinationPage({ params }: Props) {
                     >
                       <span className="text-2xl mb-1">{meta.icon}</span>
                       <span className="text-2xl font-bold text-forest leading-none">
-                        {data.score}
+                        {data.score.toFixed(1)}
                       </span>
                       <span className="text-[10px] text-gray-400 mt-0.5">/10</span>
                       <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mt-1 leading-tight">
@@ -250,7 +250,7 @@ function CategorySection({
           </p>
           <div className="flex items-baseline justify-end gap-0.5">
             <span className={`text-4xl font-bold leading-none ${scoreColor}`}>
-              {data.score}
+              {data.score.toFixed(1)}
             </span>
             <span className="text-base text-gray-400">/10</span>
           </div>

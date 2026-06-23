@@ -159,7 +159,7 @@ export default async function HomePage() {
                             />
                             <div className="absolute top-3 right-3 flex flex-col items-center justify-center w-14 h-14 rounded-full bg-gold shadow-md">
                               <span className="text-white font-bold text-base leading-none">
-                                {dest.overallScore}
+                                {dest.overallScore.toFixed(1)}
                               </span>
                               <span className="text-white/80 text-[10px] leading-none">/10</span>
                             </div>
