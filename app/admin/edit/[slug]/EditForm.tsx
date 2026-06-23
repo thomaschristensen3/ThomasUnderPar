@@ -212,7 +212,7 @@ export default function EditForm({ slug, initial, initialCategories }: Props) {
                     <span>{CATEGORY_META[key].icon}</span>
                     <span className="hidden sm:inline">{CATEGORY_META[key].label}</span>
                     {score > 0 && (
-                      <span className={`text-[10px] font-bold rounded-full px-1 py-0.5 ${activeCategory === key ? "bg-white/20 text-white" : "bg-forest/10 text-forest"}`}>{score}</span>
+                      <span className={`text-[10px] font-bold rounded-full px-1 py-0.5 ${activeCategory === key ? "bg-white/20 text-white" : "bg-forest/10 text-forest"}`}>{typeof score === "number" ? score.toFixed(1) : score}</span>
                     )}
                   </button>
                 );
@@ -231,10 +231,10 @@ export default function EditForm({ slug, initial, initialCategories }: Props) {
               <div>
                 <label className="text-sm font-medium text-gray-700 mb-2 block">Thomas&apos;s Score</label>
                 <div className="flex items-center gap-4">
-                  <input type="range" min={0} max={10} step={1} value={cat.score}
-                    onChange={(e) => setCategoryField(activeCategory, "score", parseInt(e.target.value))}
+                  <input type="range" min={0} max={10} step={0.1} value={cat.score}
+                    onChange={(e) => setCategoryField(activeCategory, "score", parseFloat(e.target.value))}
                     className="flex-1 accent-forest" />
-                  <span className="text-3xl font-bold text-forest w-10 text-center">{cat.score}</span>
+                  <span className="text-3xl font-bold text-forest w-10 text-center">{typeof cat.score === "number" ? cat.score.toFixed(1) : cat.score}</span>
                   <span className="text-gray-400">/10</span>
                 </div>
               </div>
