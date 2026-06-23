@@ -264,12 +264,17 @@ const destinations = [
 ];
 
 async function main() {
+  const existingCount = await prisma.destination.count();
+
+  if (existingCount > 0) {
+    console.log(
+      `Database already has ${existingCount} destination(s) — skipping seed.`
+    );
+    return;
+  }
+
   for (const dest of destinations) {
-    await prisma.destination.upsert({
-      where: { slug: dest.slug },
-      update: dest,
-      create: dest,
-    });
+    await prisma.destination.create({ data: dest });
   }
   console.log(`Seeded ${destinations.length} destinations.`);
 }
