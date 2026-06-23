@@ -12,6 +12,8 @@ import {
   type SocialLink,
 } from "@/types/destination";
 
+const ALL_CATEGORY_KEYS = CATEGORY_KEYS;
+
 function slugify(str: string) {
   return str
     .toLowerCase()
@@ -78,6 +80,21 @@ export default function NewReviewPage() {
         CATEGORY_KEYS.map((k) => [k, emptyCategory()])
       ) as Record<CategoryKey, CategoryData>
   );
+
+  const [includedCategories, setIncludedCategories] = useState<CategoryKey[]>([...ALL_CATEGORY_KEYS]);
+
+  function toggleCategory(key: CategoryKey) {
+    setIncludedCategories((prev) => {
+      const next = prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key];
+      // Keep at least one category included
+      if (next.length === 0) return prev;
+      // If the active tab is being removed, switch to the first remaining tab
+      if (key === activeCategory && !next.includes(key)) {
+        setActiveCategory(next[0]);
+      }
+      return next;
+    });
+  }
 
   // Auto-slug
   useEffect(() => {
@@ -163,6 +180,7 @@ export default function NewReviewPage() {
       overallScore: parseFloat(basic.overallScore),
       description: basic.description,
       published: basic.published,
+      includedCategories,
       ...categories,
     };
 
@@ -343,9 +361,43 @@ export default function NewReviewPage() {
               </p>
             </div>
 
+            {/* Category toggles */}
+            <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">
+                Active Categories
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {ALL_CATEGORY_KEYS.map((key) => {
+                  const isIncluded = includedCategories.includes(key);
+                  return (
+                    <label
+                      key={key}
+                      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-medium cursor-pointer select-none transition-colors ${
+                        isIncluded
+                          ? "bg-forest text-white border-forest"
+                          : "bg-white text-gray-400 border-gray-200 hover:border-gray-300"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className="sr-only"
+                        checked={isIncluded}
+                        onChange={() => toggleCategory(key)}
+                      />
+                      <span>{CATEGORY_META[key].icon}</span>
+                      <span>{CATEGORY_META[key].label}</span>
+                    </label>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-gray-400 mt-2">
+                Uncheck categories that don&apos;t apply to this destination. At least one must remain active.
+              </p>
+            </div>
+
             {/* Category tabs */}
             <div className="flex gap-1 p-3 border-b border-gray-100 overflow-x-auto">
-              {CATEGORY_KEYS.map((key) => {
+              {ALL_CATEGORY_KEYS.filter((key) => includedCategories.includes(key)).map((key) => {
                 const score = categories[key].score;
                 const hasContent = categories[key].description || categories[key].media.length > 0;
                 return (

@@ -87,3 +87,18 @@ export const CATEGORY_META: Record<
 export function emptyCategory(): CategoryData {
   return { score: 5, description: "", media: [], socialLinks: [] };
 }
+
+/**
+ * Returns the list of included category keys for a destination.
+ * Falls back to all 9 categories if the field is missing or invalid,
+ * ensuring backward compatibility with existing records.
+ */
+export function getIncludedCategories(
+  includedCategories: unknown
+): CategoryKey[] {
+  if (!Array.isArray(includedCategories)) return [...CATEGORY_KEYS];
+  const valid = includedCategories.filter((k): k is CategoryKey =>
+    (CATEGORY_KEYS as readonly string[]).includes(k)
+  );
+  return valid.length > 0 ? valid : [...CATEGORY_KEYS];
+}

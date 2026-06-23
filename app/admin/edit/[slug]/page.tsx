@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import EditForm from "./EditForm";
-import { CATEGORY_KEYS, type CategoryData } from "@/types/destination";
+import { CATEGORY_KEYS, type CategoryData, getIncludedCategories, type CategoryKey } from "@/types/destination";
 
 interface Props {
   params: { slug: string };
@@ -21,6 +21,8 @@ export default async function EditPage({ params }: Props) {
     CATEGORY_KEYS.map((k) => [k, dest[k] as unknown as CategoryData])
   ) as Record<(typeof CATEGORY_KEYS)[number], CategoryData>;
 
+  const includedCategories = getIncludedCategories(dest.includedCategories) as CategoryKey[];
+
   return (
     <EditForm
       slug={dest.slug}
@@ -36,6 +38,7 @@ export default async function EditPage({ params }: Props) {
         published: dest.published,
       }}
       initialCategories={categories}
+      initialIncludedCategories={includedCategories}
     />
   );
 }

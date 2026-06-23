@@ -10,12 +10,12 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import {
-  CATEGORY_KEYS,
   CATEGORY_META,
   type CategoryData,
   type CategoryKey,
   type MediaItem,
   type SocialLink,
+  getIncludedCategories,
 } from "@/types/destination";
 
 interface Props {
@@ -44,7 +44,9 @@ export default async function DestinationPage({ params }: Props) {
 
   const isLoggedIn = !!session;
 
-  const categories = CATEGORY_KEYS.map((key) => ({
+  const includedKeys = getIncludedCategories(dest.includedCategories);
+
+  const categories = includedKeys.map((key) => ({
     key,
     meta: CATEGORY_META[key],
     data: dest[key] as unknown as CategoryData,

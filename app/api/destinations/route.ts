@@ -20,6 +20,11 @@ const categorySchema = z.object({
   ),
 });
 
+const ALL_CATEGORY_KEYS = [
+  "golf", "restaurants", "hotels", "transportation", "weather",
+  "city", "friendliness", "sights", "extras",
+] as const;
+
 const schema = z.object({
   name: z.string().min(1),
   country: z.string().min(1),
@@ -34,6 +39,7 @@ const schema = z.object({
   overallScore: z.number().min(0).max(10),
   description: z.string().min(1).max(1000),
   published: z.boolean(),
+  includedCategories: z.array(z.string()).default([...ALL_CATEGORY_KEYS]),
   golf: categorySchema,
   restaurants: categorySchema,
   hotels: categorySchema,
