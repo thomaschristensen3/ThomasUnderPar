@@ -33,6 +33,9 @@ model Destination {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Which categories are active for this destination
+  includedCategories Json @default("[\"golf\",\"restaurants\",\"hotels\",\"transportation\",\"weather\",\"city\",\"friendliness\",\"sights\",\"extras\"]")
+
   // Each category: { score: number, description: string, media: MediaItem[], socialLinks: SocialLink[] }
   golf           Json @default("{\"score\":0,\"description\":\"\",\"media\":[],\"socialLinks\":[]}")
   restaurants    Json @default("{\"score\":0,\"description\":\"\",\"media\":[],\"socialLinks\":[]}")

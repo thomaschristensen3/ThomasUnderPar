@@ -10,7 +10,7 @@ import type { DestinationPin } from "./components/WorldMap";
 import Sidebar from "./components/Sidebar";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { CATEGORY_KEYS, CATEGORY_META } from "@/types/destination";
+import { CATEGORY_KEYS, CATEGORY_META, getIncludedCategories } from "@/types/destination";
 import type { CategoryData } from "@/types/destination";
 
 const WorldMap = dynamicImport(() => import("./components/WorldMap"), {
@@ -143,6 +143,7 @@ export default async function HomePage() {
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                   {destinations.map((dest) => {
+                    const included = getIncludedCategories(dest.includedCategories);
                     const golfData = dest.golf as unknown as CategoryData;
                     const foodData = dest.restaurants as unknown as CategoryData;
                     const hotelData = dest.hotels as unknown as CategoryData;
@@ -185,13 +186,13 @@ export default async function HomePage() {
                               {dest.description}
                             </p>
                             <div className="flex items-center gap-2 flex-wrap">
-                              {golfData?.score > 0 && (
+                              {included.includes("golf") && golfData?.score > 0 && (
                                 <ScorePill label="⛳ Golf" score={golfData.score} />
                               )}
-                              {foodData?.score > 0 && (
+                              {included.includes("restaurants") && foodData?.score > 0 && (
                                 <ScorePill label="🍽️ Food" score={foodData.score} />
                               )}
-                              {hotelData?.score > 0 && (
+                              {included.includes("hotels") && hotelData?.score > 0 && (
                                 <ScorePill label="🏨 Hotel" score={hotelData.score} />
                               )}
                             </div>
