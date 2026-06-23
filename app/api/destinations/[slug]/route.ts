@@ -26,10 +26,6 @@ const schema = z.object({
   continent: z.string().min(1),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
-  slug: z
-    .string()
-    .min(1)
-    .regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens"),
   heroImage: z.string().url(),
   overallScore: z.number().min(0).max(10),
   description: z.string().min(1).max(1000),
@@ -45,7 +41,10 @@ const schema = z.object({
   extras: categorySchema,
 });
 
-export async function POST(request: Request) {
+export async function PUT(
+  request: Request,
+  { params }: { params: { slug: string } }
+) {
   let body: unknown;
   try {
     body = await request.json();
@@ -59,13 +58,24 @@ export async function POST(request: Request) {
   }
 
   try {
-    const destination = await prisma.destination.create({ data: parsed.data });
-    return NextResponse.json({ slug: destination.slug }, { status: 201 });
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : "Unknown error";
-    if (msg.includes("Unique constraint")) {
-      return NextResponse.json({ error: "A destination with this slug already exists." }, { status: 409 });
-    }
+    const destination = await prisma.destination.update({
+      where: { slug: params.slug },
+      data: parsed.data,
+    });
+    return NextResponse.json({ slug: destination.slug });
+  } catch {
     return NextResponse.json({ error: "Database error" }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: { slug: string } }
+) {
+  try {
+    await prisma.destination.delete({ where: { slug: params.slug } });
+    return NextResponse.json({ ok: true });
+  } catch {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 }

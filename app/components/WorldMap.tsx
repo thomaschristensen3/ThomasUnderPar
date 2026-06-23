@@ -16,11 +16,9 @@ export interface DestinationPin {
   slug: string;
   name: string;
   country: string;
-  golfScore: number;
-  foodScore: number;
-  hotelScore: number;
+  continent: string;
   overallScore: number;
-  coordinates: [number, number];
+  coordinates: [number, number]; // [longitude, latitude]
 }
 
 export default function WorldMap({ destinations }: { destinations: DestinationPin[] }) {
@@ -37,16 +35,18 @@ export default function WorldMap({ destinations }: { destinations: DestinationPi
     if (rect) {
       const rawX = e.clientX - rect.left + 12;
       const rawY = e.clientY - rect.top - 10;
-      // Keep popup within container bounds (popup is ~224px wide, ~200px tall)
-      const x = Math.min(rawX, rect.width - 236);
-      const y = Math.max(8, Math.min(rawY, rect.height - 210));
+      const x = Math.min(rawX, rect.width - 240);
+      const y = Math.max(8, Math.min(rawY, rect.height - 160));
       setPopupPos({ x, y });
     }
     setSelected(dest);
   }
 
   return (
-    <div ref={containerRef} className="relative rounded-2xl overflow-hidden border border-gray-100 shadow-sm bg-[#dbeafe]">
+    <div
+      ref={containerRef}
+      className="relative rounded-2xl overflow-hidden border border-gray-100 shadow-sm bg-[#dbeafe]"
+    >
       <ComposableMap
         projectionConfig={{ scale: 147, rotate: [-10, 0, 0] }}
         width={800}
@@ -79,7 +79,6 @@ export default function WorldMap({ destinations }: { destinations: DestinationPi
             onClick={(e: unknown) => handlePin(dest, e as unknown as React.MouseEvent)}
           >
             <g className="cursor-pointer">
-              {/* Outer glow ring for selected pin */}
               {selected?.slug === dest.slug && (
                 <circle r={14} fill="#1B4332" fillOpacity={0.2} />
               )}
@@ -89,6 +88,7 @@ export default function WorldMap({ destinations }: { destinations: DestinationPi
                 stroke="#ffffff"
                 strokeWidth={2}
               />
+              <title>{dest.name}</title>
             </g>
           </Marker>
         ))}
@@ -103,32 +103,31 @@ export default function WorldMap({ destinations }: { destinations: DestinationPi
           <button
             onClick={() => setSelected(null)}
             className="absolute top-2 right-3 text-gray-400 hover:text-gray-600 text-xl leading-none"
-            aria-label="Close popup"
+            aria-label="Close"
           >
             ×
           </button>
-          <p className="font-bold text-gray-900 pr-5 text-sm">{selected.name}</p>
+          <p className="font-bold text-gray-900 pr-5 text-sm leading-tight">{selected.name}</p>
           <p className="text-xs text-gray-400 mb-3">{selected.country}</p>
 
-          <dl className="grid grid-cols-2 gap-y-1.5 text-xs mb-4">
-            {[
-              ["Golf", selected.golfScore],
-              ["Food", selected.foodScore],
-              ["Hotel", selected.hotelScore],
-              ["Overall", selected.overallScore],
-            ].map(([label, score]) => (
-              <div key={label as string} className="flex justify-between pr-2">
-                <dt className="text-gray-400">{label}</dt>
-                <dd className="font-semibold text-forest">{score}/10</dd>
+          <div className="flex items-center justify-between mb-4 bg-forest rounded-xl px-4 py-3">
+            <div>
+              <p className="text-[10px] text-white/60 uppercase tracking-widest font-semibold">
+                Overall Score
+              </p>
+              <div className="flex items-baseline gap-0.5">
+                <span className="text-2xl font-bold text-white">{selected.overallScore}</span>
+                <span className="text-xs text-white/50">/10</span>
               </div>
-            ))}
-          </dl>
+            </div>
+            <span className="text-3xl">⛳</span>
+          </div>
 
           <Link
             href={`/destinations/${selected.slug}`}
             className="block text-center text-xs font-semibold bg-forest text-white rounded-lg py-2 hover:bg-forest-dark transition-colors"
           >
-            View Destination →
+            View Full Review →
           </Link>
         </div>
       )}

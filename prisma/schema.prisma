@@ -8,30 +8,39 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  image     String?
-  password  String?
-  createdAt DateTime @default(now())
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String?
+  image        String?
+  password     String?
+  isPremium    Boolean   @default(false)
+  premiumSince DateTime?
+  createdAt    DateTime  @default(now())
 }
 
 model Destination {
-  id             String   @id @default(cuid())
-  slug           String   @unique
-  name           String
-  country        String
-  heroImage      String
-  galleryImages  Json     @default("[]")
-  golfScore      Int
-  foodScore      Int
-  hotelScore     Int
-  overallScore   Float
-  description    String
-  body           String
-  twitterEmbed   String?
-  instagramEmbed String?
-  published      Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  country     String
+  continent   String   @default("Unknown")
+  latitude    Float    @default(0)
+  longitude   Float    @default(0)
+  heroImage   String
+  overallScore Float
+  description String
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Each category: { score: number, description: string, media: MediaItem[], socialLinks: SocialLink[] }
+  golf           Json @default("{\"score\":0,\"description\":\"\",\"media\":[],\"socialLinks\":[]}")
+  restaurants    Json @default("{\"score\":0,\"description\":\"\",\"media\":[],\"socialLinks\":[]}")
+  hotels         Json @default("{\"score\":0,\"description\":\"\",\"media\":[],\"socialLinks\":[]}")
+  transportation Json @default("{\"score\":0,\"description\":\"\",\"media\":[],\"socialLinks\":[]}")
+  weather        Json @default("{\"score\":0,\"description\":\"\",\"media\":[],\"socialLinks\":[]}")
+  city           Json @default("{\"score\":0,\"description\":\"\",\"media\":[],\"socialLinks\":[]}")
+  friendliness   Json @default("{\"score\":0,\"description\":\"\",\"media\":[],\"socialLinks\":[]}")
+  sights         Json @default("{\"score\":0,\"description\":\"\",\"media\":[],\"socialLinks\":[]}")
+  extras         Json @default("{\"score\":0,\"description\":\"\",\"media\":[],\"socialLinks\":[]}")
 }
