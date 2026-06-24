@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 const categorySchema = z.object({
   score: z.number().min(0).max(10),
-  description: z.string(),
+  description: z.string().default(""),
   media: z.array(
     z.object({
       type: z.enum(["image", "video"]),
