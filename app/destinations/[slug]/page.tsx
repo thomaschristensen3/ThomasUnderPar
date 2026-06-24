@@ -17,7 +17,7 @@ import {
   type SocialLink,
   getIncludedCategories,
 } from "@/types/destination";
-import { parseMarkdownFormatting } from "@/lib/markdown";
+import { parseMarkdownFormatting, parseMarkdownWithParagraphs } from "@/lib/markdown";
 
 interface Props {
   params: { slug: string };
@@ -162,9 +162,9 @@ export default async function DestinationPage({ params }: Props) {
                         <span className="text-3xl">{meta.icon}</span>
                         <h2 className="text-xl font-bold text-gray-900">{meta.label}</h2>
                       </div>
-                      <p
-                        className="text-gray-600 text-sm line-clamp-3 [&_strong]:font-semibold [&_em]:italic [&_u]:underline"
-                        dangerouslySetInnerHTML={{ __html: parseMarkdownFormatting(data?.description || meta.description) }}
+                      <div
+                        className="text-gray-600 text-sm line-clamp-3 [&_strong]:font-semibold [&_em]:italic [&_u]:underline [&_p]:mb-3 [&_p:last-child]:mb-0"
+                        dangerouslySetInnerHTML={{ __html: parseMarkdownWithParagraphs(data?.description || meta.description) }}
                       />
                     </div>
                   ))}
@@ -269,9 +269,9 @@ function CategorySection({
 
       {/* Description */}
       {data.description && (
-        <p
-          className="text-gray-700 text-base leading-relaxed mb-6 [&_strong]:font-semibold [&_strong]:text-gray-900 [&_em]:italic [&_u]:underline"
-          dangerouslySetInnerHTML={{ __html: parseMarkdownFormatting(data.description) }}
+        <div
+          className="text-gray-700 text-base leading-relaxed mb-6 [&_strong]:font-semibold [&_strong]:text-gray-900 [&_em]:italic [&_u]:underline [&_p]:mb-4 [&_p:last-child]:mb-0"
+          dangerouslySetInnerHTML={{ __html: parseMarkdownWithParagraphs(data.description) }}
         />
       )}
 

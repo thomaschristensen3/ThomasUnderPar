@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { parseMarkdownFormatting } from "@/lib/markdown";
+import { parseMarkdownWithParagraphs } from "@/lib/markdown";
 
 interface RichTextEditorProps {
   value: string;
@@ -65,8 +65,10 @@ export default function RichTextEditor({
     });
   }
 
-  const previewHtml = parseMarkdownFormatting(value);
-  const hasFormatting = previewHtml !== value;
+  const previewHtml = parseMarkdownWithParagraphs(value);
+  const hasFormatting = value.trim().length > 0 && (
+    previewHtml !== `<p>${value}</p>` || /\n/.test(value)
+  );
 
   return (
     <div className="flex flex-col gap-2">
@@ -118,7 +120,7 @@ export default function RichTextEditor({
           </p>
           <div
             dangerouslySetInnerHTML={{ __html: previewHtml }}
-            className="[&_strong]:font-semibold [&_em]:italic [&_u]:underline"
+            className="[&_strong]:font-semibold [&_em]:italic [&_u]:underline [&_p]:mb-3 [&_p:last-child]:mb-0"
           />
         </div>
       )}
