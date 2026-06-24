@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const ALLOWED_IMAGE_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -109,22 +110,12 @@ export async function POST(request: Request) {
       })
     );
 
-    // Build the public URL
-    let fileUrl: string;
-    if (endpoint && endpoint.includes("t3.storageapi.dev")) {
-      // Railway S3 requires virtual-hosted-style URLs
-      fileUrl = `https://${bucket}.t3.storageapi.dev/${key}`;
-    } else if (endpoint) {
-      // Other custom endpoints (e.g. Cloudflare R2, MinIO) — path-style
-      const base = endpoint.replace(/\/$/, "");
-      fileUrl = `${base}/${bucket}/${key}`;
-    } else {
-      // Standard AWS S3
-      const r = region ?? "us-east-1";
-      fileUrl = `https://${bucket}.s3.${r}.amazonaws.com/${key}`;
-    }
+    // Generate a signed URL valid for 24 hours so the private bucket
+    // can be accessed temporarily without requiring public read access.
+    const getObjectCommand = new GetObjectCommand({ Bucket: bucket, Key: key });
+    const signedUrl = await getSignedUrl(s3Client, getObjectCommand, { expiresIn: 86400 });
 
-    return NextResponse.json({ url: fileUrl, key }, { status: 200 });
+    return NextResponse.json({ url: signedUrl, key }, { status: 200 });
   } catch (err: unknown) {
     console.error("[upload] S3 write error:", err);
     const message = err instanceof Error ? err.message : "Unknown error";
