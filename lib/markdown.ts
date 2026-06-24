@@ -15,10 +15,10 @@ export function parseMarkdownFormatting(text: string): string {
     text
       // Bold: **text** → <strong>text</strong>
       // Must come before italic so ** is matched before *
-      .replace(/\*\*(.+?)\*\*/gs, "<strong>$1</strong>")
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
       // Italic: *text* → <em>text</em>
-      .replace(/\*(.+?)\*/gs, "<em>$1</em>")
+      .replace(/\*(.+?)\*/g, "<em>$1</em>")
       // Underline: __text__ → <u>text</u>
-      .replace(/__(.+?)__/gs, "<u>$1</u>")
+      .replace(/__(.+?)__/g, "<u>$1</u>")
   );
 }
