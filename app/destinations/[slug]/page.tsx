@@ -18,6 +18,7 @@ import {
   getIncludedCategories,
 } from "@/types/destination";
 import { parseMarkdownWithParagraphs } from "@/lib/markdown";
+import { getSignedImageUrl } from "@/lib/s3-signed-url";
 
 interface Props {
   params: { slug: string };
@@ -223,7 +224,7 @@ export default async function DestinationPage({ params }: Props) {
   );
 }
 
-function CategorySection({
+async function CategorySection({
   id,
   meta,
   data,
@@ -242,6 +243,16 @@ function CategorySection({
       : data.score >= 5
       ? "text-gold"
       : "text-red-500";
+
+  // Resolve signed URLs for all image media items server-side.
+  const signedMedia: MediaItem[] = data.media
+    ? await Promise.all(
+        data.media.map(async (item) => {
+          if (item.type !== "image") return item;
+          return { ...item, url: await getSignedImageUrl(item.url) };
+        })
+      )
+    : [];
 
   return (
     <section id={id} className="scroll-mt-20">
@@ -276,8 +287,8 @@ function CategorySection({
       )}
 
       {/* Media grid */}
-      {data.media && data.media.length > 0 && (
-        <MediaGrid items={data.media} />
+      {signedMedia.length > 0 && (
+        <MediaGrid items={signedMedia} />
       )}
 
       {/* Social links */}
