@@ -7,6 +7,12 @@ const nextConfig = {
         protocol: "https",
         hostname: "picsum.photos",
       },
+      // Railway S3-compatible storage endpoint (t3.storageapi.dev)
+      // Matches: thomasunderpar-media-dkfhmt.t3.storageapi.dev
+      {
+        protocol: "https",
+        hostname: "**.t3.storageapi.dev",
+      },
       // Explicit pattern for the thomasunderpar-media S3 bucket
       // Matches: thomasunderpar-media.s3.<region>.amazonaws.com
       {
@@ -17,12 +23,6 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "**.amazonaws.com",
-      },
-      // Custom S3-compatible endpoints (Cloudflare R2, MinIO, etc.)
-      // These are matched by the wildcard below; tighten if needed.
-      {
-        protocol: "https",
-        hostname: "**",
       },
     ],
   },
