@@ -446,20 +446,30 @@ export default function NewReviewPage() {
                 </label>
                 <div className="flex items-center gap-4">
                   <input
-                    type="range"
-                    min={0}
-                    max={10}
-                    step={1}
-                    value={cat.score}
-                    onChange={(e) =>
-                      setCategoryField(activeCategory, "score", parseInt(e.target.value))
-                    }
-                    className="flex-1 accent-forest"
-                  />
-                  <span className="text-3xl font-bold text-forest w-10 text-center tabular-nums">
-                    {cat.score}
-                  </span>
-                  <span className="text-gray-400">/10</span>
+  type="range"
+  min={0}
+  max={10}
+  step={0.1}
+  value={cat.score}
+  onChange={(e) =>
+    setCategoryField(activeCategory, "score", parseFloat(e.target.value))
+  }
+  className="flex-1 accent-forest"
+/>
+<div className="w-20 shrink-0">
+  <input
+    type="number"
+    step="0.1"
+    min={0}
+    max={10}
+    value={cat.score}
+    onChange={(e) =>
+      setCategoryField(activeCategory, "score", parseFloat(e.target.value))
+    }
+    className={inp("text-center font-bold text-forest")}
+  />
+</div>
+<span className="text-gray-400">/10</span>
                 </div>
               </div>
 
