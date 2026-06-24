@@ -10,6 +10,7 @@ import {
   type MediaItem,
   type SocialLink,
 } from "@/types/destination";
+import RichTextEditor from "@/app/components/RichTextEditor";
 
 const ALL_CATEGORY_KEYS = CATEGORY_KEYS;
 
@@ -293,10 +294,12 @@ export default function EditForm({ slug, initial, initialCategories, initialIncl
               </div>
 
               <Field label="Description">
-                <textarea value={cat.description}
-                  onChange={(e) => setCategoryField(activeCategory, "description", e.target.value)}
-                  rows={5} className={inp("resize-none")}
-                  placeholder={`Write about the ${catMeta.label.toLowerCase()} experience…`} />
+                <RichTextEditor
+                  value={cat.description}
+                  onChange={(v) => setCategoryField(activeCategory, "description", v)}
+                  rows={5}
+                  placeholder={`Write about the ${catMeta.label.toLowerCase()} experience…`}
+                />
               </Field>
 
               <div>
