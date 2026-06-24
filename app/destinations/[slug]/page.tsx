@@ -18,6 +18,7 @@ import {
   getIncludedCategories,
 } from "@/types/destination";
 import { parseMarkdownWithParagraphs } from "@/lib/markdown";
+import { getSignedImageUrl } from "@/lib/s3-signed-url";
 
 interface Props {
   params: { slug: string };
@@ -43,6 +44,8 @@ export default async function DestinationPage({ params }: Props) {
 
   if (!dest) notFound();
 
+  const signedHeroImage = await getSignedImageUrl(dest.heroImage);
+
   const isLoggedIn = !!session;
 
   const includedKeys = getIncludedCategories(dest.includedCategories);
@@ -66,7 +69,7 @@ export default async function DestinationPage({ params }: Props) {
       {/* Hero */}
       <div className="relative h-[60vh] min-h-[340px] w-full">
         <Image
-          src={dest.heroImage}
+          src={signedHeroImage}
           alt={dest.name}
           fill
           priority
@@ -223,7 +226,7 @@ export default async function DestinationPage({ params }: Props) {
   );
 }
 
-function CategorySection({
+async function CategorySection({
   id,
   meta,
   data,
@@ -233,6 +236,18 @@ function CategorySection({
   data: CategoryData;
 }) {
   if (!data) return null;
+
+  // Sign all image URLs in the media list before rendering.
+  const signedMedia: MediaItem[] = data.media
+    ? await Promise.all(
+        data.media.map(async (item) => {
+          if (item.type === "image") {
+            return { ...item, url: await getSignedImageUrl(item.url) };
+          }
+          return item;
+        })
+      )
+    : [];
 
   const scoreColor =
     data.score >= 9
@@ -276,8 +291,8 @@ function CategorySection({
       )}
 
       {/* Media grid */}
-      {data.media && data.media.length > 0 && (
-        <MediaGrid items={data.media} />
+      {signedMedia.length > 0 && (
+        <MediaGrid items={signedMedia} />
       )}
 
       {/* Social links */}
