@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
 const ALLOWED_IMAGE_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -89,18 +90,24 @@ export async function POST(request: Request) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Use Bun.s3 native API
-    const s3Options: Record<string, string> = {
-      accessKeyId: accessKeyId,
-      secretAccessKey: secretAccessKey,
-      bucket: bucket,
-    };
-    if (region) s3Options.region = region;
-    if (endpoint) s3Options.endpoint = endpoint;
+    // Build S3Client config — support both standard AWS and custom endpoints (R2, MinIO, etc.)
+    const s3Client = new S3Client({
+      region: region ?? "us-east-1",
+      credentials: {
+        accessKeyId,
+        secretAccessKey,
+      },
+      ...(endpoint ? { endpoint, forcePathStyle: true } : {}),
+    });
 
-    // @ts-expect-error — Bun.s3 is a Bun-native API not in TypeScript lib
-    const s3File = Bun.s3(key, s3Options);
-    await s3File.write(buffer, { type: mimeType });
+    await s3Client.send(
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Body: buffer,
+        ContentType: mimeType,
+      })
+    );
 
     // Build the public URL
     let fileUrl: string;
