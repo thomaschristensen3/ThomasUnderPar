@@ -12,6 +12,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { CATEGORY_KEYS, CATEGORY_META, getIncludedCategories } from "@/types/destination";
 import type { CategoryData } from "@/types/destination";
+import { getSignedImageUrl } from "@/lib/s3-signed-url";
 
 const WorldMap = dynamicImport(() => import("./components/WorldMap"), {
   ssr: false,
@@ -28,13 +29,20 @@ const STATS = [
 ];
 
 export default async function HomePage() {
-  const [destinations, session] = await Promise.all([
-    prisma.destination.findMany({
-      where: { published: true },
-      orderBy: { createdAt: "asc" },
-    }),
-    getServerSession(authOptions),
-  ]);
+  const [rawDestinations, session] = await Promise.all([
+  prisma.destination.findMany({
+    where: { published: true },
+    orderBy: { createdAt: "asc" },
+  }),
+  getServerSession(authOptions),
+]);
+
+const destinations = await Promise.all(
+  rawDestinations.map(async (d) => ({
+    ...d,
+    heroImage: await getSignedImageUrl(d.heroImage),
+  }))
+);
 
   const isLoggedIn = !!session;
 
