@@ -11,6 +11,7 @@ import {
   type MediaItem,
   type SocialLink,
 } from "@/types/destination";
+import RichTextEditor from "@/app/components/RichTextEditor";
 
 const ALL_CATEGORY_KEYS = CATEGORY_KEYS;
 
@@ -463,14 +464,11 @@ export default function NewReviewPage() {
 
               {/* Description */}
               <Field label={`Description — ${catMeta.label}`}>
-                <textarea
+                <RichTextEditor
                   value={cat.description}
-                  onChange={(e) =>
-                    setCategoryField(activeCategory, "description", e.target.value)
-                  }
+                  onChange={(v) => setCategoryField(activeCategory, "description", v)}
                   rows={5}
                   placeholder={`Write about the ${catMeta.label.toLowerCase()} experience at this destination…`}
-                  className={inp("resize-none")}
                 />
               </Field>
 
