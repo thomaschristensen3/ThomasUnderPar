@@ -17,7 +17,7 @@ import {
   type SocialLink,
   getIncludedCategories,
 } from "@/types/destination";
-import { parseMarkdownFormatting, parseMarkdownWithParagraphs } from "@/lib/markdown";
+import { parseMarkdownWithParagraphs } from "@/lib/markdown";
 
 interface Props {
   params: { slug: string };
