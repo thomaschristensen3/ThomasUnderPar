@@ -111,8 +111,12 @@ export async function POST(request: Request) {
 
     // Build the public URL
     let fileUrl: string;
-    if (endpoint) {
-      // Custom endpoint (e.g. Cloudflare R2, MinIO)
+    if (endpoint && endpoint.includes("t3.storageapi.dev")) {
+      // Railway S3 (t3.storageapi.dev) uses virtual-hosted-style URLs:
+      // https://{bucket}.t3.storageapi.dev/{key}
+      fileUrl = `https://${bucket}.t3.storageapi.dev/${key}`;
+    } else if (endpoint) {
+      // Other custom endpoints (e.g. Cloudflare R2, MinIO) — path-style
       const base = endpoint.replace(/\/$/, "");
       fileUrl = `${base}/${bucket}/${key}`;
     } else {

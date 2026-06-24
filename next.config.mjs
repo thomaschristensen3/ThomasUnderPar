@@ -18,6 +18,12 @@ const nextConfig = {
         protocol: "https",
         hostname: "**.amazonaws.com",
       },
+      // Railway S3 (t3.storageapi.dev) — virtual-hosted-style bucket URLs
+      // Matches: {bucket}.t3.storageapi.dev
+      {
+        protocol: "https",
+        hostname: "*.t3.storageapi.dev",
+      },
       // Custom S3-compatible endpoints (Cloudflare R2, MinIO, etc.)
       // These are matched by the wildcard below; tighten if needed.
       {
