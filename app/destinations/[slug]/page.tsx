@@ -45,8 +45,12 @@ export default async function DestinationPage({ params }: Props) {
   const isLoggedIn = !!session;
 
   const includedKeys = getIncludedCategories(dest.includedCategories);
+  const sortedKeys = [
+    ...includedKeys.filter((k) => k === "golf"),
+    ...includedKeys.filter((k) => k !== "golf"),
+  ];
 
-  const categories = includedKeys.map((key) => ({
+  const categories = sortedKeys.map((key) => ({
     key,
     meta: CATEGORY_META[key],
     data: dest[key] as unknown as CategoryData,
