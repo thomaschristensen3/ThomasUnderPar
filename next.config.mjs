@@ -7,6 +7,12 @@ const nextConfig = {
         protocol: "https",
         hostname: "picsum.photos",
       },
+      // Explicit pattern for the thomasunderpar-media S3 bucket
+      // Matches: thomasunderpar-media.s3.<region>.amazonaws.com
+      {
+        protocol: "https",
+        hostname: "thomasunderpar-media.s3.*.amazonaws.com",
+      },
       // AWS S3 — standard bucket URLs (*.s3.*.amazonaws.com)
       {
         protocol: "https",
