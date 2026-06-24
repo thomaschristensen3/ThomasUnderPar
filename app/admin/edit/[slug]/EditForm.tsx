@@ -11,6 +11,7 @@ import {
   type SocialLink,
 } from "@/types/destination";
 import RichTextEditor from "@/app/components/RichTextEditor";
+import FileUploadInput from "@/app/components/FileUploadInput";
 
 const ALL_CATEGORY_KEYS = CATEGORY_KEYS;
 
@@ -196,8 +197,15 @@ export default function EditForm({ slug, initial, initialCategories, initialIncl
                 <input type="number" step="any" value={basic.longitude} onChange={(e) => setBasicField("longitude", e.target.value)} className={inp()} required />
               </Field>
             </div>
-            <Field label="Hero Image URL">
-              <input type="url" value={basic.heroImage} onChange={(e) => setBasicField("heroImage", e.target.value)} className={inp()} required />
+            <Field label="Hero Image">
+              <FileUploadInput
+                value={basic.heroImage}
+                onChange={(url) => setBasicField("heroImage", url)}
+                accept="image"
+                folder="hero-images"
+                placeholder="https://example.com/image.jpg"
+                required
+              />
             </Field>
             <Field label="Description">
               <textarea value={basic.description} onChange={(e) => setBasicField("description", e.target.value)} rows={3} className={inp("resize-none")} required />
@@ -310,18 +318,24 @@ export default function EditForm({ slug, initial, initialCategories, initialIncl
                   </button>
                 </div>
                 {cat.media.length === 0 && <p className="text-sm text-gray-400 italic">No media yet.</p>}
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {cat.media.map((item, idx) => (
-                    <div key={idx} className="flex gap-2 items-start p-3 bg-gray-50 rounded-xl border border-gray-100">
-                      <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
-                        <select value={item.type} onChange={(e) => updateMedia(activeCategory, idx, { type: e.target.value as "image" | "video" })} className={inp()}>
+                    <div key={idx} className="p-3 bg-gray-50 rounded-xl border border-gray-100 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <select value={item.type} onChange={(e) => updateMedia(activeCategory, idx, { type: e.target.value as "image" | "video" })} className={inp("flex-1")}>
                           <option value="image">Image</option>
                           <option value="video">Video</option>
                         </select>
-                        <input type="url" value={item.url} onChange={(e) => updateMedia(activeCategory, idx, { url: e.target.value })} placeholder="URL" className={inp()} />
-                        <input value={item.caption || ""} onChange={(e) => updateMedia(activeCategory, idx, { caption: e.target.value })} placeholder="Caption" className={inp()} />
+                        <input value={item.caption || ""} onChange={(e) => updateMedia(activeCategory, idx, { caption: e.target.value })} placeholder="Caption" className={inp("flex-1")} />
+                        <button type="button" onClick={() => removeMedia(activeCategory, idx)} className="text-gray-400 hover:text-red-500 text-xl leading-none shrink-0">×</button>
                       </div>
-                      <button type="button" onClick={() => removeMedia(activeCategory, idx)} className="text-gray-400 hover:text-red-500 text-xl leading-none mt-1">×</button>
+                      <FileUploadInput
+                        value={item.url}
+                        onChange={(url) => updateMedia(activeCategory, idx, { url })}
+                        accept={item.type === "image" ? "image" : item.type === "video" ? "video" : "both"}
+                        folder="media"
+                        placeholder={item.type === "video" ? "https://example.com/video.mp4" : "https://example.com/photo.jpg"}
+                      />
                     </div>
                   ))}
                 </div>
