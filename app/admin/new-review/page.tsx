@@ -12,6 +12,7 @@ import {
   type SocialLink,
 } from "@/types/destination";
 import RichTextEditor from "@/app/components/RichTextEditor";
+import FileUploadInput from "@/app/components/FileUploadInput";
 
 const ALL_CATEGORY_KEYS = CATEGORY_KEYS;
 
@@ -298,13 +299,13 @@ export default function NewReviewPage() {
               </Field>
             </div>
 
-            <Field label="Hero Image URL">
-              <input
+            <Field label="Hero Image">
+              <FileUploadInput
                 value={basic.heroImage}
-                onChange={(e) => setBasicField("heroImage", e.target.value)}
+                onChange={(url) => setBasicField("heroImage", url)}
+                accept="image"
+                folder="hero-images"
                 placeholder="https://example.com/image.jpg"
-                type="url"
-                className={inp()}
                 required
               />
             </Field>
@@ -491,10 +492,10 @@ export default function NewReviewPage() {
                     No media added yet. Click &quot;Add Media&quot; to include photos or videos.
                   </p>
                 )}
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {cat.media.map((item, idx) => (
-                    <div key={idx} className="flex gap-2 items-start p-3 bg-gray-50 rounded-xl border border-gray-100">
-                      <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div key={idx} className="p-3 bg-gray-50 rounded-xl border border-gray-100 space-y-2">
+                      <div className="flex items-center gap-2">
                         <select
                           value={item.type}
                           onChange={(e) =>
@@ -502,33 +503,33 @@ export default function NewReviewPage() {
                               type: e.target.value as "image" | "video",
                             })
                           }
-                          className={inp()}
+                          className={inp("flex-1")}
                         >
                           <option value="image">Image</option>
                           <option value="video">Video</option>
                         </select>
                         <input
-                          type="url"
-                          value={item.url}
-                          onChange={(e) => updateMedia(activeCategory, idx, { url: e.target.value })}
-                          placeholder="https://example.com/photo.jpg"
-                          className={inp()}
-                        />
-                        <input
                           value={item.caption || ""}
                           onChange={(e) => updateMedia(activeCategory, idx, { caption: e.target.value })}
                           placeholder="Caption (optional)"
-                          className={inp()}
+                          className={inp("flex-1")}
                         />
+                        <button
+                          type="button"
+                          onClick={() => removeMedia(activeCategory, idx)}
+                          className="text-gray-400 hover:text-red-500 transition-colors text-xl leading-none shrink-0"
+                          aria-label="Remove"
+                        >
+                          ×
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => removeMedia(activeCategory, idx)}
-                        className="text-gray-400 hover:text-red-500 transition-colors text-xl leading-none mt-1 shrink-0"
-                        aria-label="Remove"
-                      >
-                        ×
-                      </button>
+                      <FileUploadInput
+                        value={item.url}
+                        onChange={(url) => updateMedia(activeCategory, idx, { url })}
+                        accept={item.type === "image" ? "image" : item.type === "video" ? "video" : "both"}
+                        folder="media"
+                        placeholder={item.type === "video" ? "https://example.com/video.mp4" : "https://example.com/photo.jpg"}
+                      />
                     </div>
                   ))}
                 </div>
