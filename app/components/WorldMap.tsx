@@ -73,10 +73,10 @@ export default function WorldMap({ destinations }: { destinations: DestinationPi
         <ZoomableGroup
           zoom={zoom}
           center={center}
-          onMoveEnd={({ zoom: z, coordinates }) => {
-            setZoom(z);
-            setCenter(coordinates);
-          }}
+          onMoveEnd={({ zoom: z, coordinates }: { zoom: number; coordinates: [number, number] }) => {
+  setZoom(z);
+  setCenter(coordinates);
+}}
         >
           <Geographies geography={GEO_URL}>
             {({ geographies }: { geographies: GeoFeature[] }) =>
