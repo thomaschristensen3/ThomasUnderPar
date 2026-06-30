@@ -241,11 +241,11 @@ async function CategorySection({
   const signedMedia: MediaItem[] = data.media
     ? await Promise.all(
         data.media.map(async (item) => {
-          if (item.type === "image") {
-            return { ...item, url: await getSignedImageUrl(item.url) };
-          }
-          return item;
-        })
+  if (item.type === "image" || item.type === "video") {
+    return { ...item, url: await getSignedImageUrl(item.url) };
+  }
+  return item;
+})
       )
     : [];
 
