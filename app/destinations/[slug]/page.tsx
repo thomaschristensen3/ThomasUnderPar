@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 
+import MediaGrid from "@/app/components/MediaLightbox";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -302,49 +303,6 @@ async function CategorySection({
 
       <div className="mt-8 border-b border-gray-100" />
     </section>
-  );
-}
-
-function MediaGrid({ items }: { items: MediaItem[] }) {
-  return (
-    <div className={`grid gap-3 mb-6 ${items.length === 1 ? "grid-cols-1" : items.length === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-3"}`}>
-      {items.map((item, i) => (
-        <div key={i} className="relative rounded-xl overflow-hidden bg-gray-100 aspect-video group">
-          {item.type === "image" ? (
-            <>
-              <Image
-                src={item.url}
-                alt={item.caption || ""}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
-                sizes="(max-width: 640px) 100vw, 33vw"
-              />
-              {item.caption && (
-                <div className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-xs px-3 py-1.5 backdrop-blur-sm">
-                  {item.caption}
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-              <a
-                href={item.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex flex-col items-center gap-2 text-white hover:opacity-90 transition-opacity"
-              >
-                <div className="w-14 h-14 rounded-full bg-forest/90 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
-                <span className="text-xs font-medium text-gray-700">{item.caption || "Watch video"}</span>
-              </a>
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
   );
 }
 
