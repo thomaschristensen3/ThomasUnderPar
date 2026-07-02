@@ -21,56 +21,38 @@ const WorldMap = dynamicImport(() => import("./components/WorldMap"), {
   ),
 });
 
-const [rawDestinations, session, memberCount] = await Promise.all([
-  prisma.destination.findMany({
-    where: { published: true },
-    orderBy: { createdAt: "asc" },
-  }),
-  getServerSession(authOptions),
-  prisma.user.count(),
-]);
-
-const destinations = await Promise.all(
-  rawDestinations.map(async (d) => ({
-    ...d,
-    heroImage: await getSignedImageUrl(d.heroImage),
-  }))
-);
-
-const countryCount = new Set(rawDestinations.map((d) => d.country)).size;
-
 export default async function HomePage() {
-const [destinations, session, memberCount] = await Promise.all([
-  prisma.destination.findMany({
-    where: { published: true },
-    orderBy: { createdAt: "asc" },
-  }),
-  getServerSession(authOptions),
-  prisma.user.count(),
-]);
+  const [rawDestinations, session, memberCount] = await Promise.all([
+    prisma.destination.findMany({
+      where: { published: true },
+      orderBy: { createdAt: "asc" },
+    }),
+    getServerSession(authOptions),
+    prisma.user.count(),
+  ]);
 
-const countryCount = new Set(destinations.map((d) => d.country)).size;
-const coursesPlayed = destinations.filter(
-  (d) => ((d.golf as unknown as { score: number })?.score ?? 0) > 0
-).length;
+  const destinations = await Promise.all(
+    rawDestinations.map(async (d) => ({
+      ...d,
+      heroImage: await getSignedImageUrl(d.heroImage),
+    }))
+  );
 
-const STATS = [
-  { label: "Destinations", value: `${destinations.length}` },
-  { label: "Courses Played", value: `${coursesPlayed}` },
-  { label: "Countries", value: `${countryCount}` },
-  { label: "Members", value: `${memberCount.toLocaleString()}` },
-];
+  const countryCount = new Set(rawDestinations.map((d) => d.country)).size;
+  const coursesPlayed = rawDestinations.filter(
+    (d) => ((d.golf as unknown as { score: number })?.score ?? 0) > 0
+  ).length;
 
-const destinations = await Promise.all(
-  rawDestinations.map(async (d) => ({
-    ...d,
-    heroImage: await getSignedImageUrl(d.heroImage),
-  }))
-);
+  const STATS = [
+    { label: "Destinations", value: `${rawDestinations.length}` },
+    { label: "Courses Played", value: `${coursesPlayed}` },
+    { label: "Countries", value: `${countryCount}` },
+    { label: "Members", value: `${memberCount.toLocaleString()}` },
+  ];
 
   const isLoggedIn = !!session;
 
-  const pins: DestinationPin[] = destinations
+  const pins: DestinationPin[] = rawDestinations
     .filter((d) => d.latitude !== 0 || d.longitude !== 0)
     .map((d) => ({
       slug: d.slug,
@@ -100,7 +82,7 @@ const destinations = await Promise.all(
             Real reviews. Honest scores across golf, food, hotels, weather, and more.
             For golfers who want to know exactly where to go next.
           </p>
-          <a
+          
             href="#destinations"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-md bg-gold text-white font-semibold text-base hover:bg-gold-dark transition-colors"
           >
