@@ -39,21 +39,27 @@ const destinations = await Promise.all(
 
 const countryCount = new Set(rawDestinations.map((d) => d.country)).size;
 
-const STATS = [
-  { label: "Destinations", value: `${rawDestinations.length}` },
-  { label: "Courses Played", value: "200+" },
-  { label: "Countries", value: `${countryCount}` },
-  { label: "Members", value: `${memberCount.toLocaleString()}` },
-];
-
 export default async function HomePage() {
-  const [rawDestinations, session] = await Promise.all([
+const [destinations, session, memberCount] = await Promise.all([
   prisma.destination.findMany({
     where: { published: true },
     orderBy: { createdAt: "asc" },
   }),
   getServerSession(authOptions),
+  prisma.user.count(),
 ]);
+
+const countryCount = new Set(destinations.map((d) => d.country)).size;
+const coursesPlayed = destinations.filter(
+  (d) => ((d.golf as unknown as { score: number })?.score ?? 0) > 0
+).length;
+
+const STATS = [
+  { label: "Destinations", value: `${destinations.length}` },
+  { label: "Courses Played", value: `${coursesPlayed}` },
+  { label: "Countries", value: `${countryCount}` },
+  { label: "Members", value: `${memberCount.toLocaleString()}` },
+];
 
 const destinations = await Promise.all(
   rawDestinations.map(async (d) => ({
