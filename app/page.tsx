@@ -21,11 +21,29 @@ const WorldMap = dynamicImport(() => import("./components/WorldMap"), {
   ),
 });
 
+const [rawDestinations, session, memberCount] = await Promise.all([
+  prisma.destination.findMany({
+    where: { published: true },
+    orderBy: { createdAt: "asc" },
+  }),
+  getServerSession(authOptions),
+  prisma.user.count(),
+]);
+
+const destinations = await Promise.all(
+  rawDestinations.map(async (d) => ({
+    ...d,
+    heroImage: await getSignedImageUrl(d.heroImage),
+  }))
+);
+
+const countryCount = new Set(rawDestinations.map((d) => d.country)).size;
+
 const STATS = [
-  { label: "Destinations", value: "50+" },
+  { label: "Destinations", value: `${rawDestinations.length}` },
   { label: "Courses Played", value: "200+" },
-  { label: "Countries", value: "30+" },
-  { label: "Members", value: "1,000+" },
+  { label: "Countries", value: `${countryCount}` },
+  { label: "Members", value: `${memberCount.toLocaleString()}` },
 ];
 
 export default async function HomePage() {
