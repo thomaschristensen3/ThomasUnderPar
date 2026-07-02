@@ -4,13 +4,7 @@ import { useState, useRef } from "react";
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from "react-simple-maps";
 import Link from "next/link";
 
-const GEO_URL =
-  "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
-
-interface GeoFeature {
-  rsmKey: string;
-  [key: string]: unknown;
-}
+const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json";
 
 export interface DestinationPin {
   slug: string;
@@ -21,11 +15,26 @@ export interface DestinationPin {
   coordinates: [number, number];
 }
 
+interface GeoFeature {
+  rsmKey: string;
+  [key: string]: unknown;
+}
+
+const CONTINENTS = [
+  { label: "World", center: [0, 20] as [number, number], zoom: 1 },
+  { label: "Europe", center: [15, 52] as [number, number], zoom: 8 },
+  { label: "N. America", center: [-95, 45] as [number, number], zoom: 4 },
+  { label: "Asia", center: [100, 35] as [number, number], zoom: 4 },
+  { label: "Oceania", center: [140, -25] as [number, number], zoom: 5 },
+  { label: "Africa", center: [20, 5] as [number, number], zoom: 4 },
+  { label: "S. America", center: [-60, -15] as [number, number], zoom: 4 },
+];
+
 export default function WorldMap({ destinations }: { destinations: DestinationPin[] }) {
   const [selected, setSelected] = useState<DestinationPin | null>(null);
   const [popupPos, setPopupPos] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [center, setCenter] = useState<[number, number]>([0, 0]);
+  const [center, setCenter] = useState<[number, number]>([0, 20]);
   const containerRef = useRef<HTMLDivElement>(null);
 
   function handlePin(dest: DestinationPin, e: React.MouseEvent) {
@@ -44,22 +53,38 @@ export default function WorldMap({ destinations }: { destinations: DestinationPi
     setSelected(dest);
   }
 
-  const pinR = Math.max(3, 7 / Math.sqrt(zoom));
-  const strokeW = Math.max(0.5, 2 / Math.sqrt(zoom));
+  // Pins shrink as you zoom in so they don't overlap
+  const pinR = Math.max(1.5, 7 / Math.sqrt(zoom));
+  const strokeW = Math.max(0.3, 2 / Math.sqrt(zoom));
+  // Invisible hit area stays large enough to click
+  const hitR = Math.max(pinR * 2, 6 / Math.sqrt(zoom));
 
   return (
     <div
       ref={containerRef}
       className="relative rounded-2xl overflow-hidden border border-gray-100 shadow-sm bg-[#dbeafe]"
     >
+      {/* Continent shortcuts */}
+      <div className="absolute top-3 left-3 z-10 flex flex-wrap gap-1 max-w-[55%]">
+        {CONTINENTS.map((c) => (
+          <button
+            key={c.label}
+            onClick={() => { setCenter(c.center); setZoom(c.zoom); setSelected(null); }}
+            className="px-2 py-1 bg-white/90 backdrop-blur-sm rounded-full text-[10px] font-semibold text-gray-600 border border-gray-200 hover:bg-white hover:text-forest transition-colors shadow-sm"
+          >
+            {c.label}
+          </button>
+        ))}
+      </div>
+
       {/* Zoom controls */}
       <div className="absolute top-3 right-3 z-10 flex flex-col gap-1">
         <button
-          onClick={() => setZoom((z) => Math.min(z * 2, 16))}
+          onClick={() => setZoom((z) => Math.min(z * 2, 128))}
           className="w-8 h-8 bg-white rounded-lg shadow border border-gray-200 text-gray-700 font-bold text-lg hover:bg-gray-50 transition-colors flex items-center justify-center"
         >+</button>
         <button
-          onClick={() => { setZoom((z) => Math.max(z / 2, 1)); if (zoom <= 2) setCenter([0, 0]); }}
+          onClick={() => setZoom((z) => Math.max(z / 2, 1))}
           className="w-8 h-8 bg-white rounded-lg shadow border border-gray-200 text-gray-700 font-bold text-lg hover:bg-gray-50 transition-colors flex items-center justify-center"
         >−</button>
       </div>
@@ -74,9 +99,9 @@ export default function WorldMap({ destinations }: { destinations: DestinationPi
           zoom={zoom}
           center={center}
           onMoveEnd={({ zoom: z, coordinates }: { zoom: number; coordinates: [number, number] }) => {
-  setZoom(z);
-  setCenter(coordinates);
-}}
+            setZoom(z);
+            setCenter(coordinates);
+          }}
         >
           <Geographies geography={GEO_URL}>
             {({ geographies }: { geographies: GeoFeature[] }) =>
@@ -104,8 +129,10 @@ export default function WorldMap({ destinations }: { destinations: DestinationPi
               onClick={(e: unknown) => handlePin(dest, e as unknown as React.MouseEvent)}
             >
               <g className="cursor-pointer">
+                {/* Invisible larger hit area */}
+                <circle r={hitR} fill="transparent" />
                 {selected?.slug === dest.slug && (
-                  <circle r={pinR * 2} fill="#1B4332" fillOpacity={0.2} />
+                  <circle r={pinR * 2.5} fill="#1B4332" fillOpacity={0.2} />
                 )}
                 <circle
                   r={pinR}
@@ -155,7 +182,7 @@ export default function WorldMap({ destinations }: { destinations: DestinationPi
       {/* Legend */}
       <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-white/80 backdrop-blur-sm rounded-full px-3 py-1.5 text-xs text-gray-600">
         <span className="w-2.5 h-2.5 rounded-full bg-forest inline-block" />
-        Scroll or use +/− to zoom · Click a pin for details
+        Scroll or +/− to zoom · Drag to pan · Click a pin
       </div>
     </div>
   );
